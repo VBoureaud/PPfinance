@@ -8,87 +8,82 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
 contract PPF is ERC721{
-    using Counters for Counters.Counter;
-    using Strings for uint8;
+  using Counters for Counters.Counter;
+  using Strings for uint8;
 
-    uint public constant maxTokens = 10000;
-    uint public constant tokenPrice = 0.001 ether;
-    uint public constant timeDelayAfterPurchase = 1 minutes;
+  uint public constant maxTokens = 10000;
+  uint public constant tokenPrice = 0.001 ether;
+  uint public constant timeDelayAfterPurchase = 1 minutes;
 
-    Counters.Counter private tokenCounter;
+  Counters.Counter private tokenCounter;
 
-    struct Color {
-      uint8 r;
-      uint8 g;
-      uint8 b;
+  struct Color {
+    uint8 r;
+    uint8 g;
+    uint8 b;
+  }
+
+  mapping (uint => uint) public lastPurchaseTimeOfTokenId;
+  mapping (uint => uint) public purchaseOfTokenIdCounter;
+  mapping (uint => Color) public tokenIdsPixelColor;
+
+  event Purchased(address from, address to, uint price);
+
+  constructor() ERC721("ThePixel", "PX") {
+  }
+
+  // TODO implement payback the previous owner functionality
+  function purchasePixel(uint tokenId, Color memory userColor) external payable {
+    require(msg.value >= calculatePixelPrice(tokenId) , "Value below price");
+    require(checkPixelPurchasableTime(tokenId), "purchase too soon");
+
+    tokenIdsPixelColor[tokenId] = userColor;
+    purchaseOfTokenIdCounter[tokenId] = purchaseOfTokenIdCounter[tokenId] + 1;
+    lastPurchaseTimeOfTokenId[tokenId] = block.timestamp;
+
+    // first purchase aka mint
+    if (purchaseOfTokenIdCounter[tokenId] == 1){
+      tokenCounter.increment();
+      emit Purchased(address(0), msg.sender, msg.value);
+      _mint(msg.sender, tokenId);
     }
-
-    mapping (uint => uint) lastPurchaseTimeOfTokenId;
-    mapping (uint => uint) purchaseOfTokenIdCounter;
-    mapping (uint => Color) tokenIdsPixelColor;
-
-    event Purchased(address from, address to, uint price);
-
-    constructor() ERC721("ThePixel", "PX") {
+    // purchase from another holder
+    else{
+      // TODO purchase token from previous owner
+      address previousOwner = ownerOf(tokenId);
+      emit Purchased(previousOwner, msg.sender, msg.value);
+      // TODO check if approval is needed first or smart contract has it
+      transferFrom(previousOwner, msg.sender, tokenId);
+      (bool s,) = payable(previousOwner).call{value: msg.value}("");
+      require(s, "tx failed");
     }
+  }
 
-    // TODO implement payback the previous owner functionality
-    function purchasePixel(uint tokenId, Color memory userColor) external payable {
-      require(msg.value >= calculatePixelPrice(tokenId) , "Value below price");
-      require(checkPixelPurchasableTime(tokenId), "purchase too soon");
+  function checkPixelPurchasableTime(uint tokenId) public view returns(bool) {
+    return lastPurchaseTimeOfTokenId[tokenId] + timeDelayAfterPurchase <= block.timestamp;
+  }
 
-      tokenIdsPixelColor[tokenId] = userColor;
-      purchaseOfTokenIdCounter[tokenId] = purchaseOfTokenIdCounter[tokenId] + 1;
-      lastPurchaseTimeOfTokenId[tokenId] = block.timestamp;
+  function calculatePixelPrice(uint tokenId) public view returns(uint){
+    return (purchaseOfTokenIdCounter[tokenId] + 1) * tokenPrice;
+  }
 
-      // first purchase aka mint
-      if (purchaseOfTokenIdCounter[tokenId] == 1){
-        tokenCounter.increment();
-        emit Purchased(address(0), msg.sender, msg.value);
-        _mint(msg.sender, tokenId);
-      }
-      // purchase from another holder
-      else{
-        // TODO purchase token from previous owner
-        address previousOwner = ownerOf(tokenId);
-        emit Purchased(previousOwner, msg.sender, msg.value);
-        // TODO check if approval is needed first or smart contract has it
+  function tokenURI(uint256 _tokenId) override public view returns (string memory) {
+    string[7] memory parts;
+    parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 1 1"><path stroke="rgb(';
+    parts[1] = Strings.toString(tokenIdsPixelColor[_tokenId].r);
+    parts[2] = ',';
+    parts[3] = Strings.toString(tokenIdsPixelColor[_tokenId].g);
+    parts[4] = ',';
+    parts[5] = Strings.toString(tokenIdsPixelColor[_tokenId].b);
+    parts[6] = ')" d="M0 0h1"></path></svg>';
+    string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]));
+    string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "PP #', Strings.toString(_tokenId),
+        '", "description": "pixels place", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
+    output = string(abi.encodePacked('data:application/json;base64,', json));
+    return output;
+  }
 
-        transferFrom(previousOwner, msg.sender, tokenId);
-        (bool s,) = payable(previousOwner).call{value: msg.value}("");
-        require(s, "tx failed");
-      }
-        
-    }
-
-
-    function checkPixelPurchasableTime(uint tokenId) public view returns(bool) {
-      return lastPurchaseTimeOfTokenId[tokenId] + timeDelayAfterPurchase <= block.timestamp;
-    }
-
-    function calculatePixelPrice(uint tokenId) public view returns(uint){
-        return purchaseOfTokenIdCounter[tokenId] * tokenPrice;
-    }
-
-
-    function tokenURI(uint256 _tokenId) override public view returns (string memory) {
-        string[7] memory parts;
-        parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 1 1"><path stroke="rgb(';
-        parts[1] = Strings.toString(tokenIdsPixelColor[_tokenId].r);
-        parts[2] = ',';
-        parts[3] = Strings.toString(tokenIdsPixelColor[_tokenId].g);
-        parts[4] = ',';
-        parts[5] = Strings.toString(tokenIdsPixelColor[_tokenId].b);
-        parts[6] = ')" d="M0 0h1"></path></svg>';
-        string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]));
-        string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "PP #', Strings.toString(_tokenId),
-            '", "description": "pixels place", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
-        output = string(abi.encodePacked('data:application/json;base64,', json));
-        return output;
-    }
-
-
-    function totalSupply() public view returns (uint256) {
-      return tokenCounter.current();
-    }
+  function totalSupply() public view returns (uint256) {
+    return tokenCounter.current();
+  }
 }
