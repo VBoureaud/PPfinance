@@ -71,14 +71,12 @@ contract PPF is ERC721{
 
     // TODO implement SVG color part
     function tokenURI(uint256 _tokenID) override public view returns (string memory) {
-        return string(abi.encodePacked(
-          "ID: ", _tokenID, 
-          " Color: ", tokenIdsPixelColor[_tokenID].r.toString(),
-          " ", tokenIdsPixelColor[_tokenID].g.toString(),
-           " ", tokenIdsPixelColor[_tokenID].b.toString()));
+      return string(abi.encodePacked(
+        "ID: ", _tokenID, 
+        " Color: ", tokenIdsPixelColor[_tokenID].r.toString(),
+        " ", tokenIdsPixelColor[_tokenID].g.toString(),
+          " ", tokenIdsPixelColor[_tokenID].b.toString()));
     }
-
-
 
     function totalSupply() public view returns (uint256) {
       return tokenCounter.current();
