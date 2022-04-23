@@ -33,7 +33,7 @@ module.exports = {
   networks: {
     rinkeby: {
       url: `${process.env.RINKEBY_RPC_URL}`,
-      accounts: [`0x${process.env.pkey2}`] //PRIVATE_KEY
+      accounts: [`0x${process.env.PRIVATE_KEY}`] // pkey2
     }
   },
   etherscan: {

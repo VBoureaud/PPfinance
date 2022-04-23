@@ -60,7 +60,7 @@ contract PPF is ERC721, Ownable{
     else {
       address previousOwner = ownerOf(tokenId);
       emit Purchased(previousOwner, msg.sender, msg.value);
-      transferFrom(previousOwner, msg.sender, tokenId);
+      _transfer(previousOwner, msg.sender, tokenId);
       approve(address(this), tokenId);
       (bool s,) = payable(previousOwner).call{value: msg.value}("");
       require(s, "tx failed");

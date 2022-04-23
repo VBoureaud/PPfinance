@@ -9,7 +9,7 @@ async function main() {
 
   // CHANGE CONTRACT ADDRESS HERE
   const contractAddress = 
-  "0xaC4DA59Ca9Eab74e19A91670CA50B6df6C63841C"; 
+  "0x4EB09104fF5dDe029a78d9bb10DB7fCe25b2b06c"; 
   // yo
   console.log("contractAddress: ", contractAddress);
 
