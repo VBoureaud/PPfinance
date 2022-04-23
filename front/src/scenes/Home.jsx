@@ -5,22 +5,29 @@ import { Link } from "react-router-dom";
 import Web3Context from "../store/web3Context";
 import SvgMap from "../components/SvgMap";
 import NftView from "../components/NftView";
+import { coordToTokenId } from "../utils";
+import config from "../config.js";
 
 const { Title } = Typography;
 
 export default function Home(props) {
   const [visible, setVisible] = useState(false);
-  const [nft, setNft] = useState(null);
+  const [tokenId, setTokenId] = useState(null);
   
   const {
       initWeb3Modal,
       loading,
+      loadingBuy,
+      purchasePixel,
   } = useContext(Web3Context);
 
-  const handleClickNft = (nftId) => {
-    console.log({ clickNft: nftId });
-    setNft(nftId);
+  const handleClickNft = (coord) => {
+    setTokenId(coordToTokenId(coord.x, coord.y, config.xLine));
     setVisible(true);
+  }
+
+  const confirmBuy = (color) => {
+    purchasePixel(tokenId, color);
   }
 
   return (
@@ -29,32 +36,32 @@ export default function Home(props) {
         display: "flex",
         flexDirection: "column",
         width: "100%",
+        minHeight: '70vh',
       }}
     >
-      {visible && 
+      {props.isLogged && visible && 
         <NftView 
-          title={nft}
+          tokenId={tokenId}
+          loading={loadingBuy}
           visible={visible}
           setVisible={setVisible}
+          confirmBuy={confirmBuy}
         />}
 
       {!loading && props.isLogged && (
-        <div>
-          <div>
-            <SvgMap />
-          </div>
-            <Title level={4} style={{ textAlign: 'center', marginTop: '15px' }}>You are connected</Title>
-        </div>
+        <>
+          <SvgMap
+            width={window.innerWidth}
+            height={window.innerHeight}
+            onClick={handleClickNft}
+          />
+        </>
       )}
-      {/*!loading && !props.isLogged && (
-        <Button type="primary" style={{ margin: 'auto' }} onClick={initWeb3Modal}>Connect your Wallet</Button>
-      )*/}
       {!loading && !props.isLogged && (
-        <SvgMap
-          width={window.innerWidth}
-          height={window.innerHeight}
-          onClick={handleClickNft}
-        />
+        <>
+          <Typography.Title variant="h1" style={{ textAlign: 'center', marginTop: '50px' }}>Welcome to PPfinance</Typography.Title>
+          <Button type="primary" style={{ margin: '10px auto', maxWidth: '180px' }} onClick={initWeb3Modal}>Connect your Wallet</Button>
+        </>
       )}
       
       {loading && (

@@ -38,6 +38,7 @@ const styles = {
   },
   headerContainer: {
     maxWidth: '1056px',
+    padding: '0 16px',
     margin: 'auto',
     display: "flex",
     justifyContent: "space-between",
