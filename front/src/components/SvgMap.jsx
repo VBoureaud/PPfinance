@@ -1,15 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
-import {UncontrolledReactSVGPanZoom, setPointOnViewerCenter} from 'react-svg-pan-zoom';
+import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom';
+import { Button, Typography } from "antd";
 
-
-export default function SvgMap() {
+export default function SvgMap(props) {
   const Viewer = useRef(null);
   const [currentPixel, setCurrentPixel] = useState(null);
 
-  const sizeBox = 40;
-  const paddBox = 2;
-  const xNum = 10;
-  const yNum = 10;
+  const sizeBox = 15;
+  const paddBox = 1;
+  const xNum = 100;
+  const yNum = 100;
   const colors = "004b23-006400-007200-008000-38b000-70e000-9ef01a-ccff33".split('-');
 
   const range = n => Array.from(Array(n).keys())
@@ -42,53 +42,56 @@ export default function SvgMap() {
         viewWind,
         viewWind
       );
+
+      if (props.onClick)
+        props.onClick(target.id);
     }
   }
 
   return (
-    <div>
-      
-      <button className="btn" onClick={() => _zoomOnViewerCenter()}>Zoom on center</button>
-      <button className="btn" onClick={() => _fitSelection()}>Zoom area 200x200</button>
-      <button className="btn" onClick={() => _fitToViewer()}>Fit</button>
-      <hr/>
+    <div style={{ marginTop: '10px' }}>
+      <Button type="primary" onClick={() => _fitToViewer()}>
+        Reset
+      </Button>
 
-      <UncontrolledReactSVGPanZoom
-        ref={Viewer}
-        //defaultTool="pan"
-        background="#333"
-        SVGBackground="#333"
-        width={window.innerWidth} height={window.innerHeight}
-        onZoom={e => console.log('zoom')}
-        onPan={e => console.log('pan')}
-        onClick={event => handleClick(event)}
-      >
-        <svg width={617} height={316}>
-          <g fillOpacity=".5" strokeWidth="4">
-            {
-              range(yNum).map((e, key) => {
-                return range(xNum).map((e2, key2) => {
-                  const id = key + '-' + key2;
-                  const x = sizeBox + (sizeBox + paddBox) * key2;
-                  const y = sizeBox + (sizeBox + paddBox) * key;
-                  return <rect 
-                    id={id}
-                    key={id}
-                    x={x}
-                    y={y}
-                    stroke={id == currentPixel ? "#ff2626" : ''}
-                    strokeWidth={id == currentPixel ? 1 : 0}
-                    width={sizeBox}
-                    height={sizeBox}
-                    //fill="#CCC"
-                    fill={'#' + colors[parseInt(Math.random() * colors.length)]}
-                  />
+      <div style={{ background: '#333' }}>
+        <UncontrolledReactSVGPanZoom
+          ref={Viewer}
+          //defaultTool="pan"
+          background="#333"
+          SVGBackground="#333"
+          width={props.width - 50} height={props.height - 220}
+          onZoom={e => console.log('zoom')}
+          onPan={e => console.log('pan')}
+          onClick={event => handleClick(event)}
+        >
+          <svg width={617} height={316}>
+            <g fillOpacity=".5" strokeWidth="4">
+              {
+                range(yNum).map((e, key) => {
+                  return range(xNum).map((e2, key2) => {
+                    const id = key + '-' + key2;
+                    const x = sizeBox + (sizeBox + paddBox) * key2;
+                    const y = sizeBox + (sizeBox + paddBox) * key;
+                    return <rect 
+                      id={id}
+                      key={id}
+                      x={x}
+                      y={y}
+                      stroke={id === currentPixel ? "#ff2626" : ''}
+                      strokeWidth={id === currentPixel ? 1 : 0}
+                      width={sizeBox}
+                      height={sizeBox}
+                      //fill="#CCC"
+                      fill={'#' + colors[parseInt(Math.random() * colors.length)]}
+                    />
+                  })
                 })
-              })
-            }
-          </g>
-        </svg>
-      </UncontrolledReactSVGPanZoom>
+              }
+            </g>
+          </svg>
+        </UncontrolledReactSVGPanZoom>
+      </div>
     </div>
   )
 }

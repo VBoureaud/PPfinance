@@ -25,16 +25,15 @@ const styles = {
     justifyContent: "center",
     fontFamily: "Roboto, sans-serif",
     color: "#041836",
-    marginTop: "130px",
-    padding: "10px",
+    marginTop: "103px",
   },
   header: {
     position: "fixed",
     zIndex: 1,
     width: "100%",
     background: "#fff",
+    padding: 0,
     borderBottom: "2px solid rgba(0, 0, 0, 0.06)",
-    padding: "0 10px",
     boxShadow: "0 1px 10px rgb(151 164 175 / 10%)",
   },
   headerContainer: {
@@ -46,10 +45,13 @@ const styles = {
     fontFamily: "Roboto, sans-serif",
   },
   headerSub: {
-    background: "#eee",
+    background: "rgb(70, 64, 64) none repeat scroll 0% 0%",
     lineHeight: '39px',
+    padding: 0,
     textAlign: 'center',
-    height: '40px'
+    height: '40px',
+    width: '100%',
+    color: 'white',
   }
 };
 

@@ -1,0 +1,10 @@
+.steps-content {
+  margin-top: 16px;
+  padding-top: 16px;
+  text-align: center;
+  border-top: 1px solid #AAA;
+}
+
+.steps-action {
+  margin-top: 24px;
+}
