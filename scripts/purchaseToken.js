@@ -15,7 +15,7 @@ async function main() {
 
   const myContract = await hre.ethers.getContractAt("PPF", contractAddress);
 
-  await myContract.purchasePixel(1,[0,0,55], {value: "2000000000000000", gasLimit: 200000});
+  await myContract.purchasePixel(2,[123,52,91], {value: "1000000000000000", gasLimit: 200000});
   console.log("purchased pixel ");
     
 }

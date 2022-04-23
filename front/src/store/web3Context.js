@@ -133,8 +133,12 @@ export const Web3ContextProvider = (props) => {
         const possiblePurchasable = await nftContract.checkPixelPurchasableTime(tokenId);
         console.log({ possiblePurchasable });
         const tx = await nftContract.purchasePixel(tokenId, color, { value: pixelPrice });
-        console.log({ tx });
-        setLoadingBuy(false);
+        wait(tx).then(function(receipt) {
+          // do whatever you wanna do with `receipt`
+          console.log({ tx });
+          setLoadingBuy(false);
+        });
+        
     }
 
 
