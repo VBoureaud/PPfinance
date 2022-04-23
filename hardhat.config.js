@@ -31,10 +31,6 @@ module.exports = {
     ]
   },
   networks: {
-    mainnet: {
-      url: `${process.env.MAINNET_RPC_URL}`,
-      accounts: [`0x${process.env.mainnet_private_key}`]
-    },
     rinkeby: {
       url: `${process.env.RINKEBY_RPC_URL}`,
       accounts: [`0x${process.env.PRIVATE_KEY}`]

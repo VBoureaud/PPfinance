@@ -2,11 +2,11 @@
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+//import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract PPF is ERC721, Ownable {
+contract PPF is ERC721{
     using Counters for Counters.Counter;
     using Strings for uint8;
 
@@ -31,20 +31,35 @@ contract PPF is ERC721, Ownable {
     constructor() ERC721("ThePixel", "PX") {
     }
 
+    // TODO implement payback the previous owner functionality
     function purchasePixel(uint tokenId, Color memory userColor) external payable {
-        require(msg.value >= calculatePixelPrice(tokenId) , "Value below price");
-        require(checkPixelPurchasableTime(tokenId), "purchase too soon");
+      require(msg.value >= calculatePixelPrice(tokenId) , "Value below price");
+      require(checkPixelPurchasableTime(tokenId), "purchase too soon");
 
-        tokenIdsPixelColor[tokenId] = userColor;
-        purchaseOfTokenIdCounter[tokenId] = purchaseOfTokenIdCounter[tokenId] + 1;
-        lastPurchaseTimeOfTokenId[tokenId] = block.timestamp;
+      tokenIdsPixelColor[tokenId] = userColor;
+      purchaseOfTokenIdCounter[tokenId] = purchaseOfTokenIdCounter[tokenId] + 1;
+      lastPurchaseTimeOfTokenId[tokenId] = block.timestamp;
 
-        if (purchaseOfTokenIdCounter[tokenId] == 0){
-          tokenCounter.increment();
-        }
-
+      // first purchase aka mint
+      if (purchaseOfTokenIdCounter[tokenId] == 1){
+        tokenCounter.increment();
+        emit Purchased(address(0), msg.sender, msg.value);
         _mint(msg.sender, tokenId);
+      }
+      // purchase from another holder
+      else{
+        // TODO purchase token from previous owner
+        address previousOwner = ownerOf(tokenId);
+        emit Purchased(previousOwner, msg.sender, msg.value);
+        // TODO check if approval is needed first or smart contract has it
+
+        transferFrom(previousOwner, msg.sender, tokenId);
+        (bool s,) = payable(previousOwner).call{value: msg.value}("");
+        require(s, "tx failed");
+      }
+        
     }
+
 
     function checkPixelPurchasableTime(uint tokenId) public view returns(bool) {
       return lastPurchaseTimeOfTokenId[tokenId] + timeDelayAfterPurchase <= block.timestamp;
@@ -62,6 +77,8 @@ contract PPF is ERC721, Ownable {
           " ", tokenIdsPixelColor[_tokenID].g.toString(),
            " ", tokenIdsPixelColor[_tokenID].b.toString()));
     }
+
+
 
     function totalSupply() public view returns (uint256) {
       return tokenCounter.current();
