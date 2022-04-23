@@ -44,7 +44,7 @@ export default function SvgMap(props) {
       );
 
       if (props.onClick)
-        props.onClick(target.id);
+        props.onClick({ x: parseInt(coord[1]), y: parseInt(coord[0]) });
     }
   }
 

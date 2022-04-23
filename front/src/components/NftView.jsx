@@ -75,7 +75,7 @@ function NftView(props) {
 					{!isBuy && <div>
 						<Typography>Creation Date: 1234567890</Typography>
 						<Typography>Last Buy Date: 1234567890</Typography>
-						<Typography>Nb Time Bought: 5</Typography>
+						<Typography>No Time Bought: 5</Typography>
 						<Typography>Owner: 0x000000</Typography>
 						<Typography>Price: 1</Typography>
 						<Typography>Want it ?</Typography>
