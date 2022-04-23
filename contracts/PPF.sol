@@ -2,12 +2,12 @@
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-//import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract PPF is ERC721{
+contract PPF is ERC721, Ownable{
   using Counters for Counters.Counter;
   using Strings for uint8;
 
@@ -32,31 +32,43 @@ contract PPF is ERC721{
   constructor() ERC721("ThePixel", "PX") {
   }
 
-  // TODO implement payback the previous owner functionality
+  function approve(address to, uint256 tokenId) public override {
+    address owner = ERC721.ownerOf(tokenId);
+    require(to == address(this), "can only approve this smart contract");
+    require(
+        _msgSender() == owner || isApprovedForAll(owner, _msgSender()),
+        "ERC721: approve caller is not owner nor approved for all"
+    );
+
+    _approve(to, tokenId);
+  }
+
   function purchasePixel(uint tokenId, Color memory userColor) external payable {
     require(msg.value >= calculatePixelPrice(tokenId) , "Value below price");
     require(checkPixelPurchasableTime(tokenId), "purchase too soon");
+    require(tokenId <= maxTokens, "unknown Pixel");
 
-    tokenIdsPixelColor[tokenId] = userColor;
-    purchaseOfTokenIdCounter[tokenId] = purchaseOfTokenIdCounter[tokenId] + 1;
-    lastPurchaseTimeOfTokenId[tokenId] = block.timestamp;
-
-    // first purchase aka mint
-    if (purchaseOfTokenIdCounter[tokenId] == 1){
+    // mint (for the first time)
+    if (purchaseOfTokenIdCounter[tokenId] == 0){
+      require(tokenCounter.current() < maxTokens, "max minted");
       tokenCounter.increment();
       emit Purchased(address(0), msg.sender, msg.value);
       _mint(msg.sender, tokenId);
-    }
-    // purchase from another holder
-    else{
-      // TODO purchase token from previous owner
+      approve(address(this), tokenId);
+    } 
+    // purchase (from another holder)
+    else {
       address previousOwner = ownerOf(tokenId);
       emit Purchased(previousOwner, msg.sender, msg.value);
-      // TODO check if approval is needed first or smart contract has it
       transferFrom(previousOwner, msg.sender, tokenId);
+      approve(address(this), tokenId);
       (bool s,) = payable(previousOwner).call{value: msg.value}("");
       require(s, "tx failed");
     }
+    // update storage mappings
+    tokenIdsPixelColor[tokenId] = userColor;
+    purchaseOfTokenIdCounter[tokenId] = purchaseOfTokenIdCounter[tokenId] + 1;
+    lastPurchaseTimeOfTokenId[tokenId] = block.timestamp;
   }
 
   function checkPixelPurchasableTime(uint tokenId) public view returns(bool) {
@@ -86,4 +98,10 @@ contract PPF is ERC721{
   function totalSupply() public view returns (uint256) {
     return tokenCounter.current();
   }
+
+  function withdrawBalance() external onlyOwner {
+    (bool s,) = payable(msg.sender).call{value: address(this).balance}("");
+    require(s, "tx failed");
+  }
+
 }
