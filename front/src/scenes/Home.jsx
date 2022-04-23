@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 //import logo from "../assets/logo.png";
 import Web3Context from "../store/web3Context";
-//import CanvasZoom from "../components/CanvasZoom";
+import SvgMap from "../components/SvgMap";
 
 const { Title } = Typography;
 
@@ -18,7 +18,7 @@ export default function Home(props) {
       style={{
         display: "flex",
         flexDirection: "column",
-        width: "80%",
+        width: "100%",
         gap: "10px",
       }}
     >
@@ -38,7 +38,7 @@ export default function Home(props) {
               justifyContent: "center",
             }}
           >
-            Your are connected
+            <SvgMap />
           </div>
             <Title level={4} style={{ textAlign: 'center', marginTop: '15px' }}>You are connected</Title>
         </div>

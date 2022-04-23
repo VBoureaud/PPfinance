@@ -20,8 +20,8 @@ function MenuItems(props) {
         <NavLink to="/">Home</NavLink>
       </Menu.Item>
       {props.isLogged && <>
-        <Menu.Item key="/">
-          <NavLink to="/">Contact Page</NavLink>
+        <Menu.Item key="/2">
+          <NavLink to="/2">Contact Page</NavLink>
         </Menu.Item>
         </>
       }
