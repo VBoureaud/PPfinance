@@ -9,13 +9,13 @@ async function main() {
 
   // CHANGE CONTRACT ADDRESS HERE
   const contractAddress = 
-  "0x36f9bc3C015e4798B74231bAdDAf8DC534B52403"; 
+  "0xaC4DA59Ca9Eab74e19A91670CA50B6df6C63841C"; 
   // yo
   console.log("contractAddress: ", contractAddress);
 
   const myContract = await hre.ethers.getContractAt("PPF", contractAddress);
 
-  await myContract.purchasePixel(1000,[222,222,222], {value: "2000000000000000"});
+  await myContract.purchasePixel(1,[222,222,222], {value: "2000000000000000", gasLimit: 200000});
   console.log("purchased pixel ");
     
 }
