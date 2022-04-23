@@ -69,14 +69,23 @@ contract PPF is ERC721{
         return purchaseOfTokenIdCounter[tokenId] * tokenPrice;
     }
 
-    // TODO implement SVG color part
+
     function tokenURI(uint256 _tokenID) override public view returns (string memory) {
-      return string(abi.encodePacked(
-        "ID: ", _tokenID, 
-        " Color: ", tokenIdsPixelColor[_tokenID].r.toString(),
-        " ", tokenIdsPixelColor[_tokenID].g.toString(),
-          " ", tokenIdsPixelColor[_tokenID].b.toString()));
+        string[7] memory parts;
+        parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 1 1"><path stroke="rgb(';
+        parts[1] = toString(tokenIdsPixelColor[_tokenID].r);
+        parts[2] = ',';
+        parts[3] = toString(tokenIdsPixelColor[_tokenID].g);
+        parts[4] = ',';
+        parts[5] = toString(tokenIdsPixelColor[_tokenID].b);
+        parts[6] = ')" d="M0 0h1"></path></svg>';
+        string output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]));
+        string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "PP #', toString(tokenId),
+            '", "description": "pixels place", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
+        output = string(abi.encodePacked('data:application/json;base64,', json));
+        return output;
     }
+
 
     function totalSupply() public view returns (uint256) {
       return tokenCounter.current();
