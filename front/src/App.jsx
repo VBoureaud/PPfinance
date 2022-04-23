@@ -62,7 +62,7 @@ function App() {
   const isLogged = (web3 && signer);
 
   return (
-    <Layout style={{ height: "100vh", overflow: "auto" }}>
+    <Layout>
       <Router>
         <Header style={styles.header}>
           <div style={styles.headerContainer}>
