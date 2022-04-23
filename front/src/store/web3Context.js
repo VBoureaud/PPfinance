@@ -6,18 +6,18 @@ import WalletConnect from "@walletconnect/web3-provider";
 
 import config from "../config.js";
 
-//import InvestmentFactoryArtifact from "../contracts/InvestmentFactory.json";
-//import InvestmentFactoryAddress from "../contracts/InvestmentFactory_address.json";
-
-const dataTest = {};
+import NftContractArtifact from "../contracts/NftContract.json";
+import NftContractAddress from "../contracts/NftContract_address.json";
 
 const Web3Context = React.createContext({
     web3: null,
     signer: null,
     account: null,
     loading: false,
+    loadingBuy: false,
 
     initWeb3Modal: () => {},
+    purchasePixel: () => {},
 });
 
 export const Web3ContextProvider = (props) => {
@@ -25,6 +25,8 @@ export const Web3ContextProvider = (props) => {
     const [signer, setSigner] = useState(null);
     const [account, setAccount] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [loadingBuy, setLoadingBuy] = useState(false);
+    const [nftContract, setNftContract] = useState(null);
 
 /*    useEffect(() => {
         const initData = async () => {
@@ -63,11 +65,11 @@ export const Web3ContextProvider = (props) => {
 
     const initContracts = (provider) => {
         const signer = provider.getSigner();
-        /*const investmentFactory = new ethers.Contract(
-            InvestmentFactoryAddress.Contract,
-            InvestmentFactoryArtifact.abi,
+        const nftContract = new ethers.Contract(
+            NftContractAddress.Contract,
+            NftContractArtifact.abi,
             signer);
-        setFactoryContract(investmentFactory);*/
+        setNftContract(nftContract);
     }
 
     const initWeb3Modal = async () => {
@@ -79,19 +81,19 @@ export const Web3ContextProvider = (props) => {
                     package: CoinbaseWalletSDK,
                     options: {
                         appName: "PPfinance",
-                        infuraId: process.env.INFURA_KEY
+                        //infuraId: process.env.INFURA_KEY
                     }
                 },
                 walletconnect: {
                     package: WalletConnect,
                     options: {
-                        infuraId: process.env.INFURA_KEY
+                        //infuraId: process.env.INFURA_KEY
                     }
                 }
             };
 
             const web3Modal = new Web3Modal({
-                cacheProvider: false, // optional
+                cacheProvider: true, // optional
                 providerOptions // required
             });
 
@@ -120,6 +122,21 @@ export const Web3ContextProvider = (props) => {
         }
     }
 
+    // tokenId: number
+    // color: arrayOf(number) ex: [ 12, 23, 56 ]
+    const purchasePixel = async (tokenId, color) => {
+        //5*10 + 5
+        //y * maxX + x
+        setLoadingBuy(true);
+        const pixelPrice = await nftContract.calculatePixelPrice(tokenId);
+        console.log({ pixelPrice });
+        const possiblePurchasable = await nftContract.checkPixelPurchasableTime(tokenId);
+        console.log({ possiblePurchasable });
+        const tx = await nftContract.purchasePixel(tokenId, color, { value: pixelPrice });
+        console.log({ tx });
+        setLoadingBuy(false);
+    }
+
 
     return (
         <Web3Context.Provider
@@ -127,7 +144,9 @@ export const Web3ContextProvider = (props) => {
                 web3,
                 signer,
                 loading,
+                loadingBuy,
                 initWeb3Modal,
+                purchasePixel,
                 account,
             }}>
             {props.children}
