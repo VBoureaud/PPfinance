@@ -1,9 +1,17 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom';
-import { Button, Typography } from "antd";
-import { coordToTokenId } from '../../utils';
-import initial_indexes from "./assets/initial_indexes.json";
+import Icon, { LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Button } from "antd";
+// import initial_indexes from "./assets/initial_indexes.json";
 
+// sizeBox
+// paddBox
+// xNum
+// yNum
+// onClick
+// reload
+// loading
+// nftTokens
 export default function SvgMap(props) {
   const Viewer = useRef(null);
   const [currentPixel, setCurrentPixel] = useState(null);
@@ -12,48 +20,65 @@ export default function SvgMap(props) {
   const paddBox = props.paddBox;
   const xNum = props.xNum;
   const yNum = props.yNum;
-  const colors = "004b23-006400-007200-008000-38b000-70e000-9ef01a-ccff33".split('-');
+
+  // some random colors
+  // const colors = "004b23-006400-007200-008000-38b000-70e000-9ef01a-ccff33".split('-');
 
   const range = n => Array.from(Array(n).keys())
 
   useEffect(() => {
-    Viewer.current.fitSelection(0, 0, (sizeBox + paddBox) * xNum, (sizeBox + paddBox) * yNum);
+    const x = (sizeBox + paddBox) * xNum;
+    const y = (sizeBox + paddBox) * yNum;
+
+    Viewer.current.fitSelection(-x / 2, 0, x, y);
   }, []);
 
-  /* Read all the available methods in the documentation */
-  const _zoomOnViewerCenter = () => Viewer.current.zoomOnViewerCenter(1.1)
-  const _fitSelection = () => Viewer.current.fitSelection(40, 40, 200, 200)
-  const _fitToViewer = () => Viewer.current.fitToViewer('center')
+  useEffect(() => {
+    if (currentPixel) setCurrentPixel(null);
+  }, [props.loading]);
 
-  const getTokenColor = (x, y) => {
-    const defaultColor = '#555';
-    const initialToken = 'tomato';
-    const tokenId = coordToTokenId(parseInt(x), parseInt(y), xNum);
-    
+  const getTokenColor = (tokenId) => {
+    const emptyColor = '#EEE';
+    // const logoToken = 'tomato';
+
+    // Display random colors
     //const randColor = '#' + colors[parseInt(Math.random() * colors.length)];
-    if (initial_indexes.indexes.indexOf(tokenId) != -1) {
-      return initialToken;
+    
+    // Display default Logo 
+    /*if (initial_indexes.indexes.indexOf(tokenId) != -1) {
+      return logoToken;
+    }*/
+
+    // Display minted token
+    if (props.nftTokens[tokenId]) {
+      const rgb = props.nftTokens[tokenId];
+      return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
     }
-    return defaultColor;
+
+    return emptyColor;
+  }
+
+  const handleReload = () => {
+    if (props.reload)
+      props.reload();
   }
 
   const handleClick = (event) => {
-    //console.log(event.x, event.y, event.originalEvent);
     if (event 
       && event.originalEvent
       && event.originalEvent.target
       && event.originalEvent.target.id) {
-      console.log(event.originalEvent.target.id);
       const target = event.originalEvent.target;
-      setCurrentPixel(target.id);
       const coord = target.id.split('-');
       const x = sizeBox + ((sizeBox + paddBox) * coord[1]);
       const y = sizeBox + ((sizeBox + paddBox) * coord[0]);
+      
+      // size Windows in svg
       const viewWind = 200;
-
+      setCurrentPixel(target.id);
       Viewer.current.fitSelection(
-        x - viewWind / 2,
-        y - viewWind / 2,
+        x - (sizeBox + paddBox),
+        y - (sizeBox + paddBox),
         viewWind,
         viewWind
       );
@@ -64,23 +89,21 @@ export default function SvgMap(props) {
   }
 
   return (
-    <div style={{ marginTop: '10px' }}>
-      <Button type="primary" onClick={() => _fitToViewer()}>
-        Reset
+    <div style={{ background: '#333' }}>
+      <Button style={{ float: 'right', position: 'relative', zIndex: 2, marginTop: '5px', marginRight: '42px', background: '#161718', border: 'none' }} onClick={handleReload}>
+        <Icon style={{ color: 'white' }} component={ReloadOutlined} />
       </Button>
 
-      <div style={{ background: '#333' }}>
-        <UncontrolledReactSVGPanZoom
+      <div>
+        {!props.loading && <UncontrolledReactSVGPanZoom
           ref={Viewer}
           //defaultTool="pan"
           background="#333"
           SVGBackground="#333"
-          width={props.width - 50} height={props.height - 220}
-          onZoom={e => console.log('zoom')}
-          onPan={e => console.log('pan')}
+          width={props.width - 10} height={props.height}
           onClick={event => handleClick(event)}
         >
-          <svg width={617} height={316}>
+          <svg width={props.width - 100} height={props.height - 250}>
             <g fillOpacity=".5" strokeWidth="4">
               {
                 range(xNum * yNum).map((e, key) => {
@@ -102,14 +125,17 @@ export default function SvgMap(props) {
                     strokeWidth={id === currentPixel ? 1 : 0}
                     width={sizeBox}
                     height={sizeBox}
-                    fill={getTokenColor(x, y)}
+                    fill={getTokenColor(key)}
                     //fill={'#' + colors[parseInt(Math.random() * colors.length)]}
                   />
                 })
               }
             </g>
           </svg>
-        </UncontrolledReactSVGPanZoom>
+        </UncontrolledReactSVGPanZoom>}
+        {props.loading && 
+          <Icon style={{ color: 'white', fontSize: '50px', padding: '50px', margin: 'auto' }} component={LoadingOutlined} />
+        }
       </div>
     </div>
   )

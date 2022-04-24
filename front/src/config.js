@@ -3,6 +3,9 @@ const data = {
   "yNum": 100,
   "paddBox": 1,
   "sizeBox": 15,
+  "apiColors": {
+    "url": "http://127.0.0.1:8000",
+  },
   "LOCAL": {
     "CHAIN_ID": 1337,
     "RPC": "http://127.0.0.1:8545",

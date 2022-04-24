@@ -1,5 +1,4 @@
 import React, {useContext} from 'react';
-//import './App.css';
 import Web3Context from "./store/web3Context";
 
 import {
@@ -11,12 +10,10 @@ import {
 
 import "antd/dist/antd.css";
 import { Layout, Typography } from "antd";
-//import logo from "./assets/favicon-80x80.png";
 
-import MenuItems from "./components/MenuItems";
 import Home from "./scenes/Home";
 
-const { Header, Footer } = Layout;
+const { Footer } = Layout;
 const { Text, Title } = Typography;
 
 const styles = {
@@ -25,10 +22,9 @@ const styles = {
     justifyContent: "center",
     fontFamily: "Roboto, sans-serif",
     color: "#041836",
-    marginTop: "103px",
   },
   header: {
-    position: "fixed",
+    position: "relative",
     zIndex: 1,
     width: "100%",
     background: "#fff",
@@ -41,19 +37,27 @@ const styles = {
     padding: '0 16px',
     margin: 'auto',
     display: "flex",
+    height: '100%',
     justifyContent: "space-between",
     alignItems: "center",
     fontFamily: "Roboto, sans-serif",
   },
-  headerSub: {
-    background: "rgb(70, 64, 64) none repeat scroll 0% 0%",
-    lineHeight: '39px',
-    padding: 0,
-    textAlign: 'center',
-    height: '40px',
-    width: '100%',
+  rightHeader: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  accountBox: {
+    background: '#333',
     color: 'white',
-  }
+    padding: '0 14px',
+    boxSizing: 'border-box',
+    borderRadius: '13px',
+    lineHeight: '35px',
+    letterSpaccing: '1px',
+    marginRight: '2px',
+    position: 'relative',
+    top: '8px',
+  },
 };
 
 function App() {
@@ -67,20 +71,21 @@ function App() {
   return (
     <Layout>
       <Router>
-        <Header style={styles.header}>
+        <div style={styles.header}>
           <div style={styles.headerContainer}>
             <Link to="/" style={{ display: "flex", alignItems: "center" }}>
-              {/*<img src={logo} alt="logo" width="60" height="60" />*/}
-              <Title level={5}>PPfinance</Title>
+              <Title style={{ lineHeight: '35px', margin: 0 }} level={5}>PPfinance</Title>
             </Link>
-            <MenuItems isLogged={isLogged} />
+            <div style={styles.rightHeader}>
+              {account && <p style={styles.accountBox}>
+                {account.network.name} - {account.network.chainId}
+              </p>}
+              {account && <p style={styles.accountBox}>
+                {account.address.slice(0, 5) + '...' + account.address.slice(account.address.length - 5, account.address.length)}
+              </p>}
+            </div>
           </div>
-          <div style={styles.headerSub}>
-            {account && <p>
-              {account.network.name} - {account.network.chainId}
-            </p>}
-          </div>
-        </Header>
+        </div>
 
         <div style={styles.content}>
           <Switch>
@@ -93,9 +98,9 @@ function App() {
           </Switch>
         </div>
       </Router>
-      <Footer style={{ textAlign: "center" }}>
+      {!isLogged && <Footer style={{ textAlign: "center" }}>
         <Text style={{ display: "block" }}>Built at ETHAmsterdam 2022</Text>
-      </Footer>
+      </Footer>}
     </Layout>
   );
 }

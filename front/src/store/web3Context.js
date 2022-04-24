@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { ethers } from "ethers";
+import { ethers, utils } from "ethers";
 import Web3Modal from "web3modal";
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 import WalletConnect from "@walletconnect/web3-provider";
@@ -15,8 +15,13 @@ const Web3Context = React.createContext({
     account: null,
     loading: false,
     loadingBuy: false,
+    loadingPrice: false,
+    loadingCount: false,
+    openSeaLink: null,
 
     initWeb3Modal: () => {},
+    getPixelPrice: () => {},
+    countLifePixel: () => {},
     purchasePixel: () => {},
 });
 
@@ -24,21 +29,17 @@ export const Web3ContextProvider = (props) => {
     const [web3, setWeb3] = useState(null);
     const [signer, setSigner] = useState(null);
     const [account, setAccount] = useState(null);
+    const [openSeaLink, setOpenSeaLink] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [loadingPrice, setLoadingPrice] = useState(false);
+    const [loadingCount, setLoadingCount] = useState(false);
     const [loadingBuy, setLoadingBuy] = useState(false);
     const [nftContract, setNftContract] = useState(null);
-
-/*    useEffect(() => {
-        const initData = async () => {
-            //const count = await factoryContract.sizeInvestment();
-        }
-        signer && initData();
-
-    }, [factoryContract])*/
+    const [nftPrice, setNftPrice] = useState(0);
+    const [nftCount, setNftCount] = useState(0);
 
     useEffect(() => {
         const initUrlWeb3 = async () => {
-            console.log('initUrlWeb3');
             setLoading(true)
             try {
                 const provider = new ethers.providers.JsonRpcProvider(config.PROD.RPC);
@@ -59,7 +60,7 @@ export const Web3ContextProvider = (props) => {
         if (window.ethereum) {
            window.ethereum.on('accountsChanged', accounts => window.location.reload())
            window.ethereum.on('chainChanged', () => window.location.reload())
-           window.ethereum.on('connect', (connectInfo) => { console.log({connectInfo}); })
+           //window.ethereum.on('connect', (connectInfo) => { console.log({connectInfo}); })
         }
     }, [])
 
@@ -70,10 +71,10 @@ export const Web3ContextProvider = (props) => {
             NftContractArtifact.abi,
             signer);
         setNftContract(nftContract);
+        setOpenSeaLink('https://testnets.opensea.io/assets/' + NftContractAddress.Contract + '/');
     }
 
     const initWeb3Modal = async () => {
-        console.log('initWeb3Modal');
         try {
             setLoading(true)
             const providerOptions = {
@@ -81,19 +82,19 @@ export const Web3ContextProvider = (props) => {
                     package: CoinbaseWalletSDK,
                     options: {
                         appName: "PPfinance",
-                        //infuraId: process.env.INFURA_KEY
+                        infuraId: process.env.INFURA_KEY
                     }
                 },
                 walletconnect: {
                     package: WalletConnect,
                     options: {
-                        //infuraId: process.env.INFURA_KEY
+                        infuraId: process.env.INFURA_KEY
                     }
                 }
             };
 
             const web3Modal = new Web3Modal({
-                cacheProvider: true, // optional
+                cacheProvider: true,// optional
                 providerOptions // required
             });
 
@@ -110,7 +111,6 @@ export const Web3ContextProvider = (props) => {
                 txCount,
                 network,
             };
-            console.log(newAcc);
             setWeb3(provider);
             setSigner(signer);
             setAccount(newAcc);
@@ -122,32 +122,49 @@ export const Web3ContextProvider = (props) => {
         }
     }
 
+    const countLifePixel = async (tokenId) => {
+        try {
+            setLoadingCount(true);
+            const pixelCount = await nftContract.purchaseOfTokenIdCounter(tokenId);
+            setNftCount(pixelCount ? pixelCount.toNumber() : 0);
+            setLoadingCount(false);
+        } catch (e) {
+            console.log(e);
+            setLoadingCount(false);
+        }
+    }
+
+    const getPixelPrice = async (tokenId) => {
+        try {
+            setLoadingPrice(true);
+            const pixelPrice = await nftContract.calculatePixelPrice(tokenId);
+            setNftPrice(utils.formatEther(pixelPrice));
+            setLoadingPrice(false);
+        } catch (e) {
+            setLoadingPrice(false);
+        }
+    }
+
     // tokenId: number
     // color: arrayOf(number) ex: [ 12, 23, 56 ]
-    const purchasePixel = async (tokenId, color) => {
-        //5*10 + 5
-        //y * maxX + x
-        setLoadingBuy(true);
-        const pixelPrice = await nftContract.calculatePixelPrice(tokenId);
-        console.log({ pixelPrice });
-        const possiblePurchasable = await nftContract.checkPixelPurchasableTime(tokenId);
-        console.log({ possiblePurchasable });
-        const tx = await nftContract.purchasePixel(tokenId, color, { value: pixelPrice });
-
-        tx.wait().then(()=>{
-          setLoadingBuy(false);
-        });
-       
-        /* .then(()=>{
-          console.log({ tx });
-          setLoadingBuy(false);
-        }); */
-        /* const receipt = await wait(tx).then(function(receipt) {
-          // do whatever you wanna do with `receipt`
-          console.log({ tx });
-          setLoadingBuy(false);
-        }); */
-        
+    const purchasePixel = async (tokenId, color, callback) => {
+        try {
+            //if (!nftPrice) return false;
+            setLoadingBuy(true);
+            const possiblePurchasable = await nftContract.checkPixelPurchasableTime(tokenId);
+            const weiPrice = utils.parseEther(nftPrice);
+            const tx = await nftContract.purchasePixel(tokenId, color, { value: weiPrice });
+            
+            // todo manage errors
+            tx.wait().then(() => {
+                setLoadingBuy(false);
+                if (callback) callback(true);
+            });
+        }
+        catch (e) {
+            if (callback) callback(false);
+            setLoadingBuy(false);
+        }
     }
 
 
@@ -158,9 +175,16 @@ export const Web3ContextProvider = (props) => {
                 signer,
                 loading,
                 loadingBuy,
+                loadingPrice,
+                loadingCount,
                 initWeb3Modal,
                 purchasePixel,
+                getPixelPrice,
+                countLifePixel,
+                nftPrice,
+                nftCount,
                 account,
+                openSeaLink,
             }}>
             {props.children}
         </Web3Context.Provider>

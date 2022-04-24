@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ColorPicker, useColor } from "react-color-palette";
-import { Steps, Modal, Button, Typography, message } from 'antd';
+import { Steps, Modal, Button, Typography } from 'antd';
 import Icon, { LoadingOutlined } from '@ant-design/icons';
 import "react-color-palette/lib/css/styles.css";
 import "./NftView.css";
@@ -12,6 +12,11 @@ const { Step } = Steps;
 // props.visible
 // props.setVisible
 // props.loading
+// props.nftPrice
+// props.loadingPrice
+// props.nftCount
+// props.loadingCount
+// props.openSeaLink
 function NftView(props) {
 	const [color, setColor] = useColor("hex", "#121212");
 	const [isBuy, setIsBuy] = React.useState(false);
@@ -24,17 +29,14 @@ function NftView(props) {
 		setCurrent(current - 1);
 	};
 
-	const handleConfirm = () => {
+	const handleConfirm = async () => {
 		const rgbArr = [
 			color.rgb.r,
 			color.rgb.g,
 			color.rgb.b,
 		];
-		props.confirmBuy(rgbArr);
-		// todo - displayConfirm when it done
-		//props.setVisible(false);
+		await props.confirmBuy(rgbArr);
 	}
-
 
 	const steps = [
 		{
@@ -46,9 +48,6 @@ function NftView(props) {
 			content: (
 				<>
 					<Typography>Color choosed: {color.hex}</Typography>
-					<Button style={{ width: '100%' }} type="primary" onClick={handleConfirm}>
-						Buy it
-					</Button>
 				</>
 			),
 		},
@@ -64,24 +63,27 @@ function NftView(props) {
 				top: 0,
 				bottom: 0,
 			}}
-			bodyStyle={{ height: 'calc(100vh - 108px)' }}
+			bodyStyle={{ height: 'calc(100vh - 68px)' }}
 			visible={props.visible}
-			onOk={() => props.setVisible(false)}
 			onCancel={() => props.setVisible(false)}
+			footer={[]}
 		>
-			{props.loading && <Icon component={LoadingOutlined} />}
+			{props.loading && <div>
+				<Icon component={LoadingOutlined} />
+				<Typography>Careful, processing on chain, can take severals seconds...</Typography>
+			</div>}
 			{!props.loading && 
 				<>
 					{!isBuy && <div>
-						<Typography>Creation Date: 1234567890</Typography>
-						<Typography>Last Buy Date: 1234567890</Typography>
-						<Typography>No Time Bought: 5</Typography>
-						<Typography>Owner: 0x000000</Typography>
-						<Typography>Price: 1</Typography>
-						<Typography>Want it ?</Typography>
-						<Button style={{ width: '100%' }} type="primary" onClick={() => setIsBuy(true)}>
-							Buy it
+						<Typography>Price: {props.loadingPrice ? <Icon component={LoadingOutlined} /> : props.nftPrice + 'ETH'}</Typography>
+						<Typography>How many owner(s) get this NFT ?: {props.loadingCount ? <Icon component={LoadingOutlined} /> : props.nftCount}</Typography>
+						{props.nftCount && props.openSeaLink ? <Typography>Check it on <a href={props.openSeaLink + props.tokenId}>OpenSea</a></Typography> : null}
+						
+						<Typography style={{ marginTop: '10px' }}>Want it ?</Typography>
+						<Button style={{ width: '100%' }} type="primary" onClick={!props.loadingPrice && !props.loadingCount ? () => setIsBuy(true) : () => {}}>
+							{!props.loadingPrice && !props.loadingCount ? 'Buy it' : <Icon component={LoadingOutlined} />}
 						</Button>
+						<Typography>Limitation: 1 buy by minute.</Typography>
 					</div>}
 
 					{isBuy && <>
@@ -100,8 +102,8 @@ function NftView(props) {
 									</Button>
 								)}
 								{current === steps.length - 1 && (
-									<Button type="primary" onClick={() => message.success('Processing complete!')}>
-										Done
+									<Button type="primary" onClick={() => handleConfirm()}>
+										Confirm
 									</Button>
 								)}
 								{current > 0 && (

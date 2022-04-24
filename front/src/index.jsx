@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import './index.css';
 import App from './App';
 import {Web3ContextProvider} from "./store/web3Context";
+import {Web2ContextProvider} from "./store/web2Context";
 
 ReactDOM.render(
-  <div>
+  <>
     <Web3ContextProvider>
-      <App />
+      <Web2ContextProvider>
+        <App />
+      </Web2ContextProvider>
     </Web3ContextProvider>
-  </div>,
+  </>,
   document.getElementById('root')
 );
