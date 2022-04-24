@@ -1,4 +1,0 @@
-fastapi
-fastapi_utils
-web3
-uvicorn
