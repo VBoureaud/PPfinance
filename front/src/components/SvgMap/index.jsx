@@ -90,7 +90,7 @@ export default function SvgMap(props) {
   }
 
   return (
-    <div style={{ background: '#333' }}>
+    <div style={{ background: '#CCC' }}>
       <Button style={{ float: 'right', position: 'relative', zIndex: 2, marginTop: '5px', marginRight: '42px', background: '#161718', border: 'none' }} onClick={handleReload}>
         <Icon style={{ color: 'white' }} component={ReloadOutlined} />
       </Button>
@@ -99,8 +99,8 @@ export default function SvgMap(props) {
         {!props.loading && <UncontrolledReactSVGPanZoom
           ref={Viewer}
           //defaultTool="pan"
-          background="#333"
-          SVGBackground="#333"
+          background="#CCC"
+          SVGBackground="#CCC"
           width={props.width - 10} height={props.height}
           onClick={event => handleClick(event)}
         >
