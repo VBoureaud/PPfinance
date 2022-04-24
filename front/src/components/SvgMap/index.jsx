@@ -1,27 +1,41 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom';
 import { Button, Typography } from "antd";
+import { coordToTokenId } from '../../utils';
+import initial_indexes from "./assets/initial_indexes.json";
 
 export default function SvgMap(props) {
   const Viewer = useRef(null);
   const [currentPixel, setCurrentPixel] = useState(null);
 
-  const sizeBox = 15;
-  const paddBox = 1;
-  const xNum = 100;
-  const yNum = 100;
+  const sizeBox = props.sizeBox;
+  const paddBox = props.paddBox;
+  const xNum = props.xNum;
+  const yNum = props.yNum;
   const colors = "004b23-006400-007200-008000-38b000-70e000-9ef01a-ccff33".split('-');
 
   const range = n => Array.from(Array(n).keys())
 
   useEffect(() => {
-    Viewer.current.fitToViewer();
+    Viewer.current.fitSelection(0, 0, (sizeBox + paddBox) * xNum, (sizeBox + paddBox) * yNum);
   }, []);
 
   /* Read all the available methods in the documentation */
   const _zoomOnViewerCenter = () => Viewer.current.zoomOnViewerCenter(1.1)
   const _fitSelection = () => Viewer.current.fitSelection(40, 40, 200, 200)
-  const _fitToViewer = () => Viewer.current.fitToViewer()
+  const _fitToViewer = () => Viewer.current.fitToViewer('center')
+
+  const getTokenColor = (x, y) => {
+    const defaultColor = '#555';
+    const initialToken = 'tomato';
+    const tokenId = coordToTokenId(parseInt(x), parseInt(y), xNum);
+    
+    //const randColor = '#' + colors[parseInt(Math.random() * colors.length)];
+    if (initial_indexes.indexes.indexOf(tokenId) != -1) {
+      return initialToken;
+    }
+    return defaultColor;
+  }
 
   const handleClick = (event) => {
     //console.log(event.x, event.y, event.originalEvent);
@@ -29,6 +43,7 @@ export default function SvgMap(props) {
       && event.originalEvent
       && event.originalEvent.target
       && event.originalEvent.target.id) {
+      console.log(event.originalEvent.target.id);
       const target = event.originalEvent.target;
       setCurrentPixel(target.id);
       const coord = target.id.split('-');
@@ -68,24 +83,28 @@ export default function SvgMap(props) {
           <svg width={617} height={316}>
             <g fillOpacity=".5" strokeWidth="4">
               {
-                range(yNum).map((e, key) => {
-                  return range(xNum).map((e2, key2) => {
-                    const id = key + '-' + key2;
-                    const x = sizeBox + (sizeBox + paddBox) * key2;
-                    const y = sizeBox + (sizeBox + paddBox) * key;
-                    return <rect 
-                      id={id}
-                      key={id}
-                      x={x}
-                      y={y}
-                      stroke={id === currentPixel ? "#ff2626" : ''}
-                      strokeWidth={id === currentPixel ? 1 : 0}
-                      width={sizeBox}
-                      height={sizeBox}
-                      //fill="#CCC"
-                      fill={'#' + colors[parseInt(Math.random() * colors.length)]}
-                    />
-                  })
+                range(xNum * yNum).map((e, key) => {
+                  const x = key % xNum;
+                  const y = Math.floor(key / yNum);
+                  const id = y + '-' + x;
+                  const xSize = sizeBox + (sizeBox + paddBox) * x;
+                  const ySize = sizeBox + (sizeBox + paddBox) * y;
+                  
+                  //const newX = tokenId % maxWidth;
+                  //const newY = Math.floor(tokenId / maxHeight);
+
+                  return <rect 
+                    id={id}
+                    key={id}
+                    x={xSize}
+                    y={ySize}
+                    stroke={id === currentPixel ? "#ff2626" : ''}
+                    strokeWidth={id === currentPixel ? 1 : 0}
+                    width={sizeBox}
+                    height={sizeBox}
+                    fill={getTokenColor(x, y)}
+                    //fill={'#' + colors[parseInt(Math.random() * colors.length)]}
+                  />
                 })
               }
             </g>

@@ -53,6 +53,10 @@ export default function Home(props) {
           <SvgMap
             width={window.innerWidth}
             height={window.innerHeight}
+            sizeBox={config.sizeBox}
+            paddBox={config.paddBox}
+            xNum={config.xNum}
+            yNum={config.yNum}
             onClick={handleClickNft}
           />
         </>

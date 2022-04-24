@@ -1,6 +1,8 @@
 const data = {
-  "xLine": 100,
-  "yLine": 100,
+  "xNum": 100,
+  "yNum": 100,
+  "paddBox": 1,
+  "sizeBox": 15,
   "LOCAL": {
     "CHAIN_ID": 1337,
     "RPC": "http://127.0.0.1:8545",
