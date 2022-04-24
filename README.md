@@ -2,13 +2,8 @@
 
 ethAmsterdam
 
-This project demonstrates a NFT Purchasable Pixel Landscape, where each NFT represents a Pixel in a landscape that can be 
+This project demonstrates our direct purchasable NFT Pixel Landscape, completely onchain with SVG art. 
 
-Try running 
-
-```shell
-yarn install
-```
 
 # Dapp
 
