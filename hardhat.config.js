@@ -34,8 +34,17 @@ module.exports = {
     rinkeby: {
       url: `${process.env.RINKEBY_RPC_URL}`, //PRIVATE_KEY
       accounts: [`0x${process.env.PRIVATE_KEY}`] // pkey2
-    }
+    },
+    matic: {
+      url: "https://rpc-mumbai.maticvigil.com",
+      accounts: [process.env.PRIVATE_KEY]
+    },
+    'optimistic-kovan': {
+      chainId: 69,
+      url: 'https://kovan.optimism.io',
+      accounts: [process.env.PRIVATE_KEY]
   },
+    },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
   },
