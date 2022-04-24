@@ -82,13 +82,13 @@ export const Web3ContextProvider = (props) => {
                     package: CoinbaseWalletSDK,
                     options: {
                         appName: "PPfinance",
-                        infuraId: process.env.INFURA_KEY
+                        infuraId: 'ebc3a388e39840dc8313350226433c1e'
                     }
                 },
                 walletconnect: {
                     package: WalletConnect,
                     options: {
-                        infuraId: process.env.INFURA_KEY
+                        infuraId: 'ebc3a388e39840dc8313350226433c1e'
                     }
                 }
             };
