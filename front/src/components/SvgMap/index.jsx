@@ -30,7 +30,8 @@ export default function SvgMap(props) {
     const x = (sizeBox + paddBox) * xNum;
     const y = (sizeBox + paddBox) * yNum;
 
-    Viewer.current.fitSelection(-x / 2, 0, x, y);
+    if (Viewer && Viewer.current)
+      Viewer.current.fitSelection(-x / 2, 0, x, y);
   }, []);
 
   useEffect(() => {
