@@ -4,7 +4,7 @@ const data = {
   "paddBox": 1,
   "sizeBox": 15,
   "apiColors": {
-    "url": "http://127.0.0.1:8000",
+    "url": "https://colorsnft.herokuapp.com/",
   },
   "LOCAL": {
     "CHAIN_ID": 1337,
