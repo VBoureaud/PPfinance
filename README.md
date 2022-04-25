@@ -16,3 +16,6 @@ This project demonstrates our direct purchasable NFT Pixel Landscape, completely
 
 [testnet Opensea](https://testnets.opensea.io/collection/thepixel-jgsc699yse)
 
+[Kovan - Optimism Smart Contract](https://kovan-optimistic.etherscan.io/address/0x5007F473F72Be9E605C6FC38B3923b478b2d873b)
+
+
