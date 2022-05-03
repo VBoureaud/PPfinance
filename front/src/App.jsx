@@ -84,7 +84,7 @@ function App() {
                 {account.address.slice(0, 5) + '...' + account.address.slice(account.address.length - 5, account.address.length)}
               </p>}
               <p style={styles.accountBox}>
-                <a style={{ color: 'white' }} href="https://twitter.com/p_pfinance">Twitter</a>
+                <a style={{ color: 'white' }} target="_blank" href="https://twitter.com/p_pfinance">Twitter</a>
               </p>
             </div>
           </div>
@@ -103,7 +103,7 @@ function App() {
       </Router>
       {!isLogged && <Footer style={{ textAlign: "center" }}>
         <Text style={{ display: "block" }}>Built at ETHAmsterdam 2022</Text>
-        <Text style={{ display: "block" }}>Find us on <a href="https://github.com/VBoureaud/PPfinance">Github</a></Text>
+        <Text style={{ display: "block" }}>Find us on <a target="_blank" href="https://github.com/VBoureaud/PPfinance">Github</a></Text>
       </Footer>}
     </Layout>
   );
