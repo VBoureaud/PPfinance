@@ -11,10 +11,11 @@ This project demonstrates our direct purchasable NFT Pixel Landscape, completely
 
 ## Links
 
-
 [Rinkeby Smart Contract](https://rinkeby.etherscan.io/address/0x877ae605f9488e3cf4d220f20fefd1980772d156)
 
 [testnet Opensea](https://testnets.opensea.io/collection/thepixel-jgsc699yse)
+
+[Kovan - Optimism Smart Contract](https://kovan-optimistic.etherscan.io/address/0x5007F473F72Be9E605C6FC38B3923b478b2d873b)
 
 
 ## What is it?
@@ -24,3 +25,6 @@ Interactive pixel canvas, based on Reddit's r/place and Million Dollar Homepage,
 ## How it's made?
 
 Notable hacky bit: Although our NFTs are images (one pixel), they do not have to be stored on ipfs or require any additional storage. All pixel RBG data is stored onchain (EVMs for now). We can derive x and y coordinates on canvas grid using the token index, and we can render the pixel offchain from the RGB values stored on the smart contract. We set our pixel to be an <svg> onchain so anyone can render it independently. Sponsors: Ethereum & Optimism & Polygon helped us with testnets and resources (faucets, nodes, validators). Coinbase and WalletConnect helped us with APIs to connect user wallets to our front end. 
+
+
+
