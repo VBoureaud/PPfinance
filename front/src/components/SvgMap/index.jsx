@@ -91,11 +91,12 @@ export default function SvgMap(props) {
 
   return (
     <div style={{ background: '#CCC' }}>
-      <Button style={{ float: 'right', position: 'relative', zIndex: 2, marginTop: '5px', marginRight: '42px', background: '#161718', border: 'none' }} onClick={handleReload}>
+      {!props.loading && <Button style={{ float: 'right', position: 'relative', zIndex: 2, marginTop: '5px', marginRight: '42px', background: '#161718', border: 'none' }} onClick={handleReload}>
         <Icon style={{ color: 'white' }} component={ReloadOutlined} />
-      </Button>
+      </Button>}
 
-      <div style={{ overflow: 'hidden' }}>
+      {/*<div style={{ overflowY: 'hidden' }}> cannot because tool display issue in mobile */}
+      <div>
         {!props.loading && <UncontrolledReactSVGPanZoom
           ref={Viewer}
           //defaultTool="pan"

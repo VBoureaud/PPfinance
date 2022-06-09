@@ -107,7 +107,7 @@ function App() {
           </Switch>
         </div>
       </Router>
-      {!isLogged && <Footer style={{ textAlign: "center", paddingTop: "30px" }}>
+      {!isLogged && <Footer style={{ textAlign: "center", paddingTop: "60px" }}>
         <Text style={{ display: "block" }}>Built at ETHAmsterdam 2022 - v1.0.2</Text>
         <Text style={{ display: "block" }}>Find us on <a rel="noreferrer" target="_blank" href="https://github.com/VBoureaud/PPfinance">Github</a></Text>
       </Footer>}
