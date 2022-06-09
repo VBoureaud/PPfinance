@@ -1,13 +1,14 @@
 import pymongo
 import base64
 import json
+import datetime
 from config import config
 
 dbName = config['dbName']
 collectionName = "pixels"
 
 ## DB CONNECT
-CONNECTION_STRING = "mongodb+srv://" + config['dbUser'] + ":" + config['dbPwd'] + "@cluster0.orywm.mongodb.net/" + dbName + "?retryWrites=true&w=majority"
+CONNECTION_STRING = "mongodb+srv://" + config['dbUser'] + ":" + config['dbPwd'] + "@" + config['dbCluster'] + dbName + "?retryWrites=true&w=majority"
 if (config['dev']):
 	CONNECTION_STRING = "mongodb://localhost:27017/" + dbName
 myclient = pymongo.MongoClient(CONNECTION_STRING)
@@ -46,7 +47,9 @@ def dbCreateAndSave(data):
 
 # Save in first position
 def dbSaveData(data):
-	print(data)
+	#print(data)
+	now = datetime.datetime.now()
+	print(str(now) + ': save new pixels')
 	dataDB = getAll()
 	if (len(dataDB) == 0):
 		return dbCreateAndSave(data)

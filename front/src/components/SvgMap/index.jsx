@@ -51,7 +51,7 @@ export default function SvgMap(props) {
     }*/
 
     // Display minted token
-    if (props.nftTokens[tokenId]) {
+    if (props.nftTokens && props.nftTokens[tokenId]) {
       const rgb = props.nftTokens[tokenId];
       return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
     }
@@ -95,7 +95,7 @@ export default function SvgMap(props) {
         <Icon style={{ color: 'white' }} component={ReloadOutlined} />
       </Button>
 
-      <div>
+      <div style={{ overflow: 'hidden' }}>
         {!props.loading && <UncontrolledReactSVGPanZoom
           ref={Viewer}
           //defaultTool="pan"

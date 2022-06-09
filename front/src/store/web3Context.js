@@ -151,7 +151,7 @@ export const Web3ContextProvider = (props) => {
         try {
             //if (!nftPrice) return false;
             setLoadingBuy(true);
-            const possiblePurchasable = await nftContract.checkPixelPurchasableTime(tokenId);
+            //const possiblePurchasable = await nftContract.checkPixelPurchasableTime(tokenId);
             const weiPrice = utils.parseEther(nftPrice);
             const tx = await nftContract.purchasePixel(tokenId, color, { value: weiPrice });
             

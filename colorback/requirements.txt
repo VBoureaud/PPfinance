@@ -3,3 +3,4 @@ fastapi_utils
 web3
 uvicorn
 pymongo
+pymongo[srv]

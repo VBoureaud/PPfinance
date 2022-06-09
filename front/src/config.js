@@ -4,7 +4,8 @@ const data = {
   "paddBox": 1,
   "sizeBox": 15,
   "apiColors": {
-    "url": "https://colorsnft.herokuapp.com/",
+    //"url": "https://colorsnft.herokuapp.com/",
+    "url": "https://ppfinance.herokuapp.com/",
   },
   "LOCAL": {
     "CHAIN_ID": 1337,
@@ -14,7 +15,7 @@ const data = {
   },
   "PROD": {
     "CHAIN_ID": 4,
-    "RPC": "https://rinkeby.infura.io/v3/",
+    "RPC": "https://rinkeby.infura.io/v3/ebc3a388e39840dc8313350226433c1e",
     "NATIVE_DECIMAL": '18',
     "STABLE_DECIMAL": '6',
   },

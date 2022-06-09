@@ -1,4 +1,4 @@
-import { Button, Typography, message } from "antd";
+import { Button, message } from "antd";
 import React, { useContext, useEffect, useState } from "react";
 import Web3Context from "../store/web3Context";
 import Web2Context from "../store/web2Context";
@@ -12,7 +12,6 @@ export default function Home(props) {
   const [tokenId, setTokenId] = useState(null);
 
   const {
-      initWeb3Modal,
       loading,
       loadingBuy,
       loadingPrice,
@@ -39,11 +38,15 @@ export default function Home(props) {
   }, [])
 
   const handleClickPixel = (coord) => {
-    const tkId = coordToTokenId(coord.x, coord.y, config.xNum);
-    setTokenId(tkId);
-    getPixelPrice(tkId);
-    countLifePixel(tkId);
-    setVisible(true);
+    if (props.isLogged) {
+      const tkId = coordToTokenId(coord.x, coord.y, config.xNum);
+      setTokenId(tkId);
+      getPixelPrice(tkId);
+      countLifePixel(tkId);
+      setVisible(true);
+    } else {
+      message.warn('You need to be connected to continue.');
+    }
   }
 
   const successBuy = async (success) => {
@@ -84,11 +87,11 @@ export default function Home(props) {
           openSeaLink={openSeaLink}
         />}
 
-      {!loading && props.isLogged && (
+      {!loading && (
         <>
           <SvgMap
             width={window.innerWidth}
-            height={window.innerHeight - 50}
+            height={window.innerHeight - 200}
             sizeBox={config.sizeBox}
             paddBox={config.paddBox}
             xNum={config.xNum}
@@ -99,15 +102,6 @@ export default function Home(props) {
             nftTokens={nftTokens}
           />
         </>
-      )}
-      {!loading && !props.isLogged && (
-        <>
-          <Typography.Title variant="h1" style={{ textAlign: 'center', marginTop: '50px' }}>Welcome to PPfinance</Typography.Title>
-          <Button type="primary" style={{ margin: '10px auto', maxWidth: '180px' }} onClick={initWeb3Modal}>Connect your Wallet</Button>
-          <p style={{ maxWidth: '1064px', margin: '15px auto', padding: '15px' }}>
-            Directly purchasable onchain NFTs represented on an interactive pixel canvas
-          </p>
-          </>
       )}
       
       {loading && (

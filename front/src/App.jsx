@@ -37,6 +37,7 @@ const styles = {
     padding: '0 16px',
     margin: 'auto',
     display: "flex",
+    flexWrap: "wrap",
     height: '100%',
     justifyContent: "space-between",
     alignItems: "center",
@@ -65,6 +66,7 @@ function App() {
     web3,
     signer,
     account,
+    initWeb3Modal,
   } = useContext(Web3Context);
   const isLogged = (web3 && signer);
 
@@ -73,10 +75,14 @@ function App() {
       <Router>
         <div style={styles.header}>
           <div style={styles.headerContainer}>
-            <Link to="/" style={{ display: "flex", alignItems: "center" }}>
+            <Link to="/" style={{ display: "flex", flexDirection: "column", lineHeight: "15px", color: '#333' }}>
               <Title style={{ lineHeight: '35px', margin: 0 }} level={5}>PPfinance</Title>
+              <p>Directly purchasable onchain NFTs represented on an interactive pixel canvas, on <b>Rinkeby.</b></p>
             </Link>
             <div style={styles.rightHeader}>
+              {!account && <p style={styles.accountBox}>
+                <span rel="noreferrer" style={{ cursor: 'pointer', color: 'white' }} onClick={initWeb3Modal}>Connect your wallet</span>
+              </p>}
               {account && <p style={styles.accountBox}>
                 {account.network.name} - {account.network.chainId}
               </p>}
@@ -84,7 +90,7 @@ function App() {
                 {account.address.slice(0, 5) + '...' + account.address.slice(account.address.length - 5, account.address.length)}
               </p>}
               <p style={styles.accountBox}>
-                <a style={{ color: 'white' }} target="_blank" href="https://twitter.com/p_pfinance">Twitter</a>
+                <a rel="noreferrer" style={{ color: 'white' }} target="_blank" href="https://twitter.com/p_pfinance">Twitter</a>
               </p>
             </div>
           </div>
@@ -101,9 +107,9 @@ function App() {
           </Switch>
         </div>
       </Router>
-      {!isLogged && <Footer style={{ textAlign: "center" }}>
-        <Text style={{ display: "block" }}>Built at ETHAmsterdam 2022</Text>
-        <Text style={{ display: "block" }}>Find us on <a target="_blank" href="https://github.com/VBoureaud/PPfinance">Github</a></Text>
+      {!isLogged && <Footer style={{ textAlign: "center", paddingTop: "30px" }}>
+        <Text style={{ display: "block" }}>Built at ETHAmsterdam 2022 - v1.0.2</Text>
+        <Text style={{ display: "block" }}>Find us on <a rel="noreferrer" target="_blank" href="https://github.com/VBoureaud/PPfinance">Github</a></Text>
       </Footer>}
     </Layout>
   );
